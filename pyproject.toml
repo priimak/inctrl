@@ -1,0 +1,21 @@
+[project]
+name = "tt"
+dynamic = ["version"]
+description = "Instrument controll python API"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+]
+
+[build-system]
+requires = ["setuptools", "wheel", "setuptools-git-versioning"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools-git-versioning]
+enabled = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.png"]
