@@ -9,7 +9,7 @@ if __name__ == '__main__':
     c1.set_range(-1, 10)
 
     scope.trigger.arm_single(ScopeTrigger.EDGE(c1, level_V = 0.5))
-    scope.trigger.wait_for_waveform(error_on_timeout = True)
+    scope.trigger.wait_for_waveform(timeout = "5 s", error_on_timeout = True)
     scope.trigger.is_armed()
     scope.trigger.disarm()
 

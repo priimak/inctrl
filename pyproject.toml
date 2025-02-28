@@ -1,11 +1,10 @@
 [project]
-name = "tt"
+name = "inctrl"
 dynamic = ["version"]
-description = "Instrument controll python API"
+description = "Instrument control python API"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = [
-]
+dependencies = []
 
 [build-system]
 requires = ["setuptools", "wheel", "setuptools-git-versioning"]
