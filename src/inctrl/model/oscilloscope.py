@@ -73,8 +73,31 @@ class ScopeEdgeTrigger(ScopeTrigger):
 
 class TriggerNamespace(ABC):
     @abstractmethod
-    def arm_single(self, trigger: ScopeTrigger) -> None:
-        pass
+    def configure(self, trigger: ScopeTrigger) -> None:
+        """
+        Apply trigger configuration. This might be irrelevant if trigger is fired manually or set to auto.
+        """
+
+    @abstractmethod
+    def arm_single(self) -> None:
+        """
+        Arm trigger for a one shot accusation. This is a non-blocking function. To confirm that trigger
+        is set call function `scope.trigger.is_armed()`. Note that conditions for trigger to be fired and therefore
+        disarmed might be met even before this functions returns. In which case `is_armed()` called right after would
+        return False.
+        """
+
+    @abstractmethod
+    def arm_auto(self) -> None:
+        """
+        Arm trigger for periodic automatic firing. If this function is called trigger configuration is ignored.
+        """
+
+    @abstractmethod
+    def arm_normal(self) -> None:
+        """
+        Arm trigger to be fired every time conditions as defined when `scope.trigger.configure(...)` was called.
+        """
 
     @abstractmethod
     def wait_for_waveform(self, timeout: str | None = None, error_on_timeout: bool = False) -> bool:
