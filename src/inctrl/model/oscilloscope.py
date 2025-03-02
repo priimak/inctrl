@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from enum import Enum
-from typing import Self
+from enum import Enum, IntEnum
+from typing import Self, Type
 
 from inctrl.model.time import Duration
 from inctrl.model.waveform import Waveform
@@ -16,34 +16,84 @@ class ChannelCoupling(str, Enum):
     GND = "GND"
 
 
+class ChannelImpedance(IntEnum):
+    FIFTY_OHM = 50
+    ONE_MOHM = 1_000_000
+
+
 class ScopeChanel(TriggerSource):
     @abstractmethod
     def get_waveform(self) -> Waveform:
-        pass
+        """ Download waveform from the oscilloscope. """
 
+    ################################ Coupling ################################
     @abstractmethod
-    def set_coupling(self, coupling: ChannelCoupling) -> None:
-        """ Set coupling on the channel. """
+    def set_coupling(self, coupling: ChannelCoupling, fail_on_error: bool = False) -> ChannelCoupling:
+        """
+        Set coupling on the channel. If `fail_on_error` is set to True and requested coupling
+        cannot be set (perhaps because it is unsupported), then RuntimeError will be raised.
+        If `fail_on_error` is False (default), then simply return actually set channel coupling
+        even if it is different from the requested.
+        """
 
     @abstractmethod
     def get_coupling(self) -> ChannelCoupling:
         """ Get currently configured coupling on the channel. """
 
-    def set_range(self, v_min: float, v_max: float) -> tuple[float, float]:
+    ################################ Input Impedance ################################
+    def set_impedance_oHm(self, impedance_oHm: float, fail_on_error: bool = False) -> float:
+        """
+        Set impedance on the channel in OHm. If `fail_on_error` is set to True and requested impedance
+        cannot be set (perhaps because it is an unsupported value), then RuntimeError will be raised.
+        If `fail_on_error` is False (default), then simply return actually set impedance even if it is
+        different from the requested.
+
+        Allowed impedance values are usually a small discrete set, but can vary from one scope make
+        and model to another. To obtain list of allowed impedance values for this scope
+        call `scope.properties.get_impedance_list()`.
+        """
+
+    def get_impedance_oHm(self) -> float:
+        """ Return impedance configured on the channel. """
+
+    def set_impedance_min(self) -> float:
+        """ Set impedance to the minimum value and return actually configured value in oHm """
+
+    def set_impedance_max(self) -> float:
+        """ Set impedance to the maximum value and return actually configured value in oHm """
+
+    ################################ Vertical Scaling ################################
+    @abstractmethod
+    def set_range_V(self, v_min: float, v_max: float) -> tuple[float, float]:
         """
         Set voltage range to be at minimum from v_min to v_max and return actually configured range.
         Raises RuntimeError if v_min >= v_max.
         """
 
+    @abstractmethod
     def get_range(self) -> tuple[float, float]:
-        """
-        Return voltage range currently configured on the channel.
-        """
+        """ Return voltage range currently configured on the channel. """
+
+    @abstractmethod
+    def set_scale_V(self, v: float) -> float:
+        """ Set vertical scale in voltage per division and return actually set value. """
+
+    @abstractmethod
+    def get_scale_V(self) -> float:
+        """ Return configured vertical scale in voltage per division. """
+
+    @abstractmethod
+    def set_offset_V(self, offset_V: float) -> float:
+        """ Set vertical offset in volts and return actually set value. """
+
+    @abstractmethod
+    def get_offset_V(self) -> float:
+        """ Return configured vertical offset in volts. """
 
 
 class TriggerSlope(str, Enum):
-    NEGATIVE = "NEGATIVE"
-    POSITIVE = "POSITIVE"
+    RISING = "RISING"
+    FALLING = "FALLING"
 
 
 class ScopeTrigger(ABC):
@@ -55,8 +105,8 @@ class ScopeTrigger(ABC):
     def EDGE(cls,
              trigger_source: TriggerSource,
              level_V: float,
-             slope: TriggerSlope = TriggerSlope.POSITIVE,
-             delay: str = "0 s") -> Self:
+             slope: TriggerSlope = TriggerSlope.RISING,
+             delay: str | Duration = Duration.value_of("0 s")) -> Self:
         return ScopeEdgeTrigger(trigger_source, level_V, slope, delay)
 
 
@@ -64,7 +114,7 @@ class ScopeEdgeTrigger(ScopeTrigger):
     def __init__(self,
                  trigger_source: TriggerSource,
                  level_V: float,
-                 slope: TriggerSlope = TriggerSlope.POSITIVE,
+                 slope: TriggerSlope = TriggerSlope.RISING,
                  delay: str = "0 s"):
         super().__init__(trigger_source, Duration.value_of(delay))
         self.level_V = level_V
@@ -100,7 +150,7 @@ class TriggerNamespace(ABC):
         """
 
     @abstractmethod
-    def wait_for_waveform(self, timeout: str | None = None, error_on_timeout: bool = False) -> bool:
+    def wait_for_waveform(self, timeout: str | Duration | None = None, error_on_timeout: bool = False) -> bool:
         """
         Blocking call to wait for trigger to become activated and waveform available for downloading and return True.
         If above conditions were not met, then return False, unless error_on_timeout is True and timeout
@@ -121,7 +171,20 @@ class TriggerNamespace(ABC):
         """
 
 
+class ScopeProperties(ABC):
+    @abstractmethod
+    def get_impedance_list(self) -> list[float]:
+        """ Returns list of allowed impedance values that can be set on any given channel. """
+
+
 class Oscilloscope(ABC):
+    def as_class[T: Oscilloscope](self, clazz: Type[T]) -> T:
+        """ Cast instance of this class to `clazz` or raise RuntimeError it is not possible. """
+        if isinstance(self, clazz):
+            return self
+        else:
+            raise RuntimeError(f"Not an instance of {clazz.__name__}")
+
     @abstractmethod
     def channel(self, channel: int | str) -> ScopeChanel:
         """
@@ -140,9 +203,22 @@ class Oscilloscope(ABC):
     def set_time_window(self, time_window: str | Duration) -> Duration:
         """
         Ensure that capture time window will be at least as large as requested `time_window` value.
-        Return actually set time window, which will always equal or larger than requested .
+        Return actually set time window, which will always be equal or larger than requested value.
         """
 
     @abstractmethod
     def get_time_window(self) -> Duration:
         """ Return current time window configured on the oscilloscope. """
+
+    @abstractmethod
+    def set_time_per_div(self, scale: str | Duration) -> Duration:
+        """ Set timescale in duration per horizontal division and return actually set value. """
+
+    @abstractmethod
+    def get_time_per_div(self) -> Duration:
+        """ Return configured timescale in duration per horizontal division. """
+
+    @abstractmethod
+    @property
+    def properties(self) -> ScopeProperties:
+        """ Access oscilloscope properties. """

@@ -1,0 +1,19 @@
+site_name: InCtrl
+theme:
+  name: material
+  features:
+    - navigation.sections
+
+# Markdown extensions
+markdown_extensions:
+  - attr_list
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+
+nav:
+  - "Introduction": "index.md"
+  - "Name and params resolution": "name_resolution.md"
+  - "Oscilloscope API": "oscilloscope.md"
+  - "Waveform": "waveform.md"

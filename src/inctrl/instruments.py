@@ -3,6 +3,10 @@ from typing import Any
 from inctrl.model.oscilloscope import Oscilloscope
 
 
+class X(Oscilloscope):
+    pass
+
+
 def oscilloscope(address: str, capabilities: dict[str, Any] | None = None) -> Oscilloscope:
     """
     Return oscilloscope for a given address. If `capabilities` is provided, then ensure that oscilloscope
