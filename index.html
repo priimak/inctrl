@@ -311,6 +311,24 @@
 
 
 <h1 id="inctrl-instruments-control-python-api">InCtrl - Instruments Control Python API<a class="headerlink" href="#inctrl-instruments-control-python-api" title="Permanent link">&para;</a></h1>
+<p><em>InCtrl</em> library provides high level API to common electronics bench instruments, such programmable power supplies,
+electronic loads, oscilloscopes and many more. Its intent is twofold. Provide API at such high level so as to minimize
+cognitive load on electrical and application engineers working and the lab making lab automation easy. And second,
+make it possible to write code that would use <em>InCtrl</em> library to be agnostic to instruments makes and model where
+possible, i.e. application engineers should be able to swap one equipment make for another and have their python scripts
+continue running without any change. To that end interation with the instruments happens using generic handlers to
+instrument types. For example, to interact with power supply user need to create an instance of <code>PowerSupply</code> class
+like so</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">inctrl</span><span class="w"> </span><span class="kn">import</span> <span class="n">power_supply</span><span class="p">,</span> <span class="n">PowerSupply</span>
+
+<span class="n">ps</span><span class="p">:</span> <span class="n">PowerSupply</span> <span class="o">=</span> <span class="n">power_supply</span><span class="p">(</span><span class="s2">&quot;$ps_address&quot;</span><span class="p">,</span> <span class="n">channel</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<p>Function <code>power_supply(...)</code> when called will discover make and mode of a particular power supply and return appropriate
+instance of <code>PowerSupply</code>. That could be <code>RigolPowerSupply</code>, <code>KikusuiPowerSupply</code> or what have you. User does not have
+to be concerned with make and model that power supply. This is of course true only up to a point. For example, you may
+need power supply that can supply 100 Watts and swapping one for another might not even though API would stay the same.
+To resolve this issue user can request specific capabilities that instantiating power supply my have. Details of that
+can be found in other pages.</p>
 
 
 

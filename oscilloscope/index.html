@@ -694,13 +694,13 @@ a whole, (2) channels and (3) a trigger.</p>
 class <code>Duration</code>. Since often not every time interval can be set, this function returns actually set duration
 for the capture window. However, we guarantee that actually set time window will always be greater or equal
 to the requested value and never less.</p>
-<p>Alternatively you can set duration per time division.</p>
+<p>Alternatively you can set duration per time division, also known as <em>time scale</em></p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">inctrl.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Duration</span>
 
-<span class="n">time_per_div</span><span class="p">:</span> <span class="n">Duration</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">set_time_per_div</span><span class="p">(</span><span class="s2">&quot;5 us&quot;</span><span class="p">)</span>
+<span class="n">time_per_div</span><span class="p">:</span> <span class="n">Duration</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">set_time_scale</span><span class="p">(</span><span class="s2">&quot;5 us&quot;</span><span class="p">)</span>
 </code></pre></div>
-<p>Similarly to <code>set_time_window(...)</code> function <code>set_time_per_div(...)</code> also returns actually set value.</p>
-<p>Configured values can also be retrieved by calling <code>scope.get_time_window()</code> and <code>scope.get_time_per_div()</code>.</p>
+<p>Similarly to <code>set_time_window(...)</code> function <code>set_time_scale(...)</code> also returns actually set value.</p>
+<p>Configured values can also be retrieved by calling <code>scope.get_time_window()</code> and <code>scope.get_time_scale()</code>.</p>
 <h3 id="channel">Channel<a class="headerlink" href="#channel" title="Permanent link">&para;</a></h3>
 <p>To obtain handles to a given scope channel you can call <code>scope.channel(...)</code> function. This function accepts
 either channel number of channel name. In the later case channel name has to be defined through mechanisms
