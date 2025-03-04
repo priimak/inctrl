@@ -7,7 +7,8 @@ requires-python = ">=3.13"
 dependencies = [
     "numpy",
     "pyarrow",
-    "pyvisa"
+    "pyvisa",
+    "tabulate"
 ]
 
 [build-system]

@@ -1,6 +1,7 @@
 from typing import Any
 
 from pyvisa import ResourceManager, Resource
+from tabulate import tabulate
 
 from inctrl.drivers import INSTRUMENT_DB_INSTANCE
 from inctrl.drivers.command_dispatcher import CommandDispatcher
@@ -8,7 +9,11 @@ from inctrl.model import ISpec, InstrumentType
 from inctrl.model.oscilloscope import Oscilloscope
 
 
-def list_instruments() -> list[ISpec]:
+def list_instruments(print_to_stdout: bool = True) -> list[ISpec]:
+    """
+    Obtain and optionally print (default is to print) list of available/connected
+    instruments. Returns list of ISpec objects.
+    """
     rm = ResourceManager()
     addresses = rm.list_resources()
     instrument_specs: list[ISpec] = []
@@ -20,6 +25,14 @@ def list_instruments() -> list[ISpec]:
             instrument_specs.append(INSTRUMENT_DB_INSTANCE.get_spec(address, idn))
         finally:
             resource.close()
+
+    if print_to_stdout:
+        table = [
+            [s.name, s.address, s.make, s.model, s.instrument_type.value]
+            for s in instrument_specs
+        ]
+        print(tabulate(table, tablefmt = "orgtbl", headers = ["Name", "Address", "Make", "Model", "Instrument Type"]))
+
     return instrument_specs
 
 
