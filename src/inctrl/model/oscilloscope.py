@@ -194,10 +194,10 @@ class Oscilloscope(ABC):
         :param channel: channel number or name
         """
 
-    @abstractmethod
     @property
+    @abstractmethod
     def trigger(self) -> TriggerNamespace:
-        pass
+        """ Access trigger namespace. """
 
     @abstractmethod
     def set_time_window(self, time_window: str | Duration) -> Duration:
@@ -211,14 +211,14 @@ class Oscilloscope(ABC):
         """ Return current time window configured on the oscilloscope. """
 
     @abstractmethod
-    def set_time_per_div(self, scale: str | Duration) -> Duration:
+    def set_time_scale(self, scale: str | Duration) -> Duration:
         """ Set timescale in duration per horizontal division and return actually set value. """
 
     @abstractmethod
-    def get_time_per_div(self) -> Duration:
+    def get_time_scale(self) -> Duration:
         """ Return configured timescale in duration per horizontal division. """
 
-    @abstractmethod
     @property
+    @abstractmethod
     def properties(self) -> ScopeProperties:
         """ Access oscilloscope properties. """

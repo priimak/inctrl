@@ -65,17 +65,17 @@ class `Duration`. Since often not every time interval can be set, this function 
 for the capture window. However, we guarantee that actually set time window will always be greater or equal
 to the requested value and never less.
 
-Alternatively you can set duration per time division.
+Alternatively you can set duration per time division, also known as _time scale_
 
 ```python
 from inctrl.model import Duration
 
-time_per_div: Duration = scope.set_time_per_div("5 us")
+time_per_div: Duration = scope.set_time_scale("5 us")
 ```
 
-Similarly to `set_time_window(...)` function `set_time_per_div(...)` also returns actually set value.
+Similarly to `set_time_window(...)` function `set_time_scale(...)` also returns actually set value.
 
-Configured values can also be retrieved by calling `scope.get_time_window()` and `scope.get_time_per_div()`.
+Configured values can also be retrieved by calling `scope.get_time_window()` and `scope.get_time_scale()`.
 
 ### Channel
 
