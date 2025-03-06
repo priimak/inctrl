@@ -46,7 +46,7 @@ def _get_spec(address: str) -> tuple[CommandDispatcher, ISpec]:
         return CommandDispatcher(resource), INSTRUMENT_DB_INSTANCE.get_spec(address, idn)
 
 
-def oscilloscope(address: str, capabilities: dict[str, Any] | None = None) -> Oscilloscope:
+def oscilloscope(address: str, capabilities: dict[str, Any] | None = None, reset: bool = False) -> Oscilloscope:
     """
     Return oscilloscope for a given address. If `capabilities` is provided, then ensure that oscilloscope
     to be instantiated does have requested capabilities. Raises RuntimeError if instrument under this
@@ -55,6 +55,9 @@ def oscilloscope(address: str, capabilities: dict[str, Any] | None = None) -> Os
     """
     cmd, spec = _get_spec(address)
     if spec.instrument_type == InstrumentType.OSCILLOSCOPE:
-        return spec.instrument_class(spec, cmd)
+        instrument_instance = spec.instrument_class(spec, cmd)
+        if reset:
+            instrument_instance.reset()
+        return instrument_instance
     else:
         raise RuntimeError("This instrument is not an oscilloscope")

@@ -218,8 +218,8 @@ def EDGE(
 As you can see default `slope` is `TriggerSlope.RISING` but you can change to `TriggerSlope.FALLING`.
 Parameter `delay` refer to position on the screen when trigger is fired. Default value of 0 seconds places trigger
 position in the middle of the screen, i.e. there is a same duration of captured signal before and after trigger.
-Setting delay to negative value moves trigger position to the left, i.e. there is more data points captured after
-the trigger than before. Setting delay to positive value moves trigger position to the right, i.e. there is fewer
+Setting delay to positive value moves trigger position to the left, i.e. there is more data points captured after
+the trigger than before. Setting delay to negative value moves trigger position to the right, i.e. there is fewer
 data points captured after the trigger than before.
 
 #### Operations
@@ -314,7 +314,7 @@ scope.trigger.configure(ScopeTrigger.EDGE(
     level_V = 1.6,
 
     # we are interested in mosty what happens after the trigger point
-    delay = "-20 us",
+    delay = "20 us",
 
     # capture on the falling edge as by default signal is pulled up
     slope = TriggerSlope.FALLING

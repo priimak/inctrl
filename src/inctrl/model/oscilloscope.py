@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from enum import Enum, IntEnum
 from typing import Self, Type
 
@@ -7,7 +8,9 @@ from inctrl.model.waveform import Waveform
 
 
 class TriggerSource(ABC):
-    pass
+    @abstractmethod
+    def internal_id(self) -> str:
+        pass
 
 
 class ChannelCoupling(str, Enum):
@@ -22,6 +25,10 @@ class ChannelImpedance(IntEnum):
 
 
 class ScopeChanel(TriggerSource):
+    @abstractmethod
+    def _scope(self) -> "Oscilloscope":
+        pass
+
     @abstractmethod
     def get_waveform(self) -> Waveform:
         """ Download waveform from the oscilloscope. """
@@ -41,6 +48,7 @@ class ScopeChanel(TriggerSource):
         """ Get currently configured coupling on the channel. """
 
     ################################ Input Impedance ################################
+    @abstractmethod
     def set_impedance_oHm(self, impedance_oHm: float, fail_on_error: bool = False) -> float:
         """
         Set impedance on the channel in OHm. If `fail_on_error` is set to True and requested impedance
@@ -53,26 +61,34 @@ class ScopeChanel(TriggerSource):
         call `scope.properties.get_impedance_list()`.
         """
 
+    @abstractmethod
     def get_impedance_oHm(self) -> float:
         """ Return impedance configured on the channel. """
 
     def set_impedance_min(self) -> float:
         """ Set impedance to the minimum value and return actually configured value in oHm """
+        return self.set_impedance_oHm(min(self._scope().properties.valid_impedance_values))
 
     def set_impedance_max(self) -> float:
         """ Set impedance to the maximum value and return actually configured value in oHm """
+        return self.set_impedance_oHm(max(self._scope().properties.valid_impedance_values))
 
     ################################ Vertical Scaling ################################
-    @abstractmethod
     def set_range_V(self, v_min: float, v_max: float) -> tuple[float, float]:
         """
         Set voltage range to be at minimum from v_min to v_max and return actually configured range.
         Raises RuntimeError if v_min >= v_max.
         """
+        scale = (v_max - v_min) / self._scope().properties.number_of_vertical_divisions
+        self.set_scale_V(scale)
+        self.set_offset_V((v_max - v_min) / 2 - v_max)
+        return self.get_range_V()
 
-    @abstractmethod
-    def get_range(self) -> tuple[float, float]:
+    def get_range_V(self) -> tuple[float, float]:
         """ Return voltage range currently configured on the channel. """
+        offset_V = self.get_offset_V()
+        dv = self.get_scale_V() * self._scope().properties.number_of_vertical_divisions / 2
+        return -offset_V - dv, -offset_V + dv
 
     @abstractmethod
     def set_scale_V(self, v: float) -> float:
@@ -171,10 +187,12 @@ class TriggerNamespace(ABC):
         """
 
 
-class ScopeProperties(ABC):
-    @abstractmethod
-    def get_impedance_list(self) -> list[float]:
-        """ Returns list of allowed impedance values that can be set on any given channel. """
+@dataclass(frozen = True)
+class ScopeProperties:
+    valid_impedance_values: list[float]
+    number_of_time_divisions: int
+    number_of_vertical_divisions: int
+    number_of_channels: int
 
 
 class Oscilloscope(ABC):
@@ -199,16 +217,25 @@ class Oscilloscope(ABC):
     def trigger(self) -> TriggerNamespace:
         """ Access trigger namespace. """
 
-    @abstractmethod
     def set_time_window(self, time_window: str | Duration) -> Duration:
         """
         Ensure that capture time window will be at least as large as requested `time_window` value.
         Return actually set time window, which will always be equal or larger than requested value.
         """
+        requested_time_window: Duration = Duration.value_of(time_window)
+        requested_scale_ref: Duration = requested_time_window / self.properties.number_of_time_divisions
+        requested_scale = requested_scale_ref
+        for i in range(50):  # try max 50 times
+            set_scale = self.set_time_scale(requested_scale)
+            if set_scale >= requested_scale:
+                return self.get_time_window()
+            else:
+                requested_scale = requested_scale_ref * (1 + 0.1 * i)
+        return self.get_time_window()
 
-    @abstractmethod
     def get_time_window(self) -> Duration:
         """ Return current time window configured on the oscilloscope. """
+        return (self.get_time_scale() * self.properties.number_of_time_divisions).optimize()
 
     @abstractmethod
     def set_time_scale(self, scale: str | Duration) -> Duration:
@@ -222,3 +249,7 @@ class Oscilloscope(ABC):
     @abstractmethod
     def properties(self) -> ScopeProperties:
         """ Access oscilloscope properties. """
+
+    @abstractmethod
+    def reset(self) -> None:
+        pass

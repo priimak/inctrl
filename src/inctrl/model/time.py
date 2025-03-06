@@ -50,15 +50,39 @@ class Duration:
 
     def __init__(self, time_interval: float, time_unit: TimeUnit):
         self.__time_interval = time_interval
-        self.__time_unit = time_unit
+        self.time_unit = time_unit
 
     def __str__(self):
-        return f"{self.__time_interval} {self.__time_unit.to_str()}"
+        return f"{self.__time_interval} {self.time_unit.to_str()}"
+
+    def __mul__(self, scale):
+        return Duration(self.__time_interval * scale, self.time_unit)
+
+    def __rmul__(self, scale):
+        return Duration(self.__time_interval * scale, self.time_unit)
+
+    def __truediv__(self, scale):
+        return Duration(self.__time_interval / scale, self.time_unit)
+
+    def __gt__(self, other):
+        return self.__time_interval > other.to_float(self.time_unit)
+
+    def __ge__(self, other):
+        return self.__time_interval >= other.to_float(self.time_unit)
+
+    def __lt__(self, other):
+        return self.__time_interval < other.to_float(self.time_unit)
+
+    def __le__(self, other):
+        return self.__time_interval <= other.to_float(self.time_unit)
+
+    def __eq__(self, other):
+        return self.__time_interval == other.to_float(self.time_unit)
 
     def in_unit(self, time_unit: str | TimeUnit) -> Self:
         target_time_unit = TimeUnit.value_of(time_unit)
         return Duration(
-            self.__time_interval * self.__time_unit.value / target_time_unit.value,
+            self.__time_interval * self.time_unit.value / target_time_unit.value,
             target_time_unit
         )
 
@@ -71,11 +95,11 @@ class Duration:
             return Duration(float(match_result.group('value')), TimeUnit.value_of(match_result.group('unit')))
 
     def to_float(self, time_unit: str | TimeUnit) -> float:
-        return self.__time_interval * self.__time_unit.value / TimeUnit.value_of(time_unit).value
+        return self.__time_interval * self.time_unit.value / TimeUnit.value_of(time_unit).value
 
+    def optimize(self) -> Self:
+        for time_unit in [TimeUnit.KS, TimeUnit.S, TimeUnit.MS, TimeUnit.US, TimeUnit.NS]:
+            if 1000 > self.to_float(time_unit) >= 1:
+                return self.in_unit(time_unit)
 
-if __name__ == '__main__':
-    a = Duration.value_of("1.234 us")
-    b = a.in_unit("s")
-    print(a)
-    print(b.to_float("ns"))
+        return self.in_unit(TimeUnit.NS)
