@@ -32,10 +32,8 @@ class SDS8OscilloscopeChannel(ScopeChanel):
         self.scope._cmd.write(":WAVEFORM:INTERVAL 1")
         self.scope._cmd.write(":WAVEFORM:WIDTH WORD")
         self.scope._cmd.write(f":WAVEFORM:SOURCE C{self.__channel_num}")
-        header = self.scope._cmd.query_bytes(":WAVEFORM:PREAMBLE?")
-        with open("header.bin", "wb") as f:
-            f.write(header)
 
+        header = self.scope._cmd.query_bytes(":WAVEFORM:PREAMBLE?")
         num_points = unpack("<L", header[116:120])[0]
         vertical_scale = unpack("<f", header[156:160])[0]  # "vdiv"
         vertical_offset = unpack("<f", header[160:164])[0]  # "offset"
