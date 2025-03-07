@@ -14,6 +14,7 @@ markdown_extensions:
 
 nav:
   - "Introduction": "index.md"
+  - "Supported instruments": "supported_instruments.md"
   - "Name and params resolution": "name_resolution.md"
   - "Oscilloscope API": "oscilloscope.md"
   - "Waveform": "waveform.md"
