@@ -30,8 +30,11 @@ class ScopeChanel(TriggerSource):
         pass
 
     @abstractmethod
-    def get_waveform(self) -> Waveform:
-        """ Download waveform from the oscilloscope. """
+    def get_waveform(self, name: str | None = None) -> Waveform:
+        """ 
+        Download waveform from the oscilloscope. Waveform will have a name derived from channel number 
+        or if argument `name` is provided, it will be used as a Waveform name. 
+        """
 
     ################################ Coupling ################################
     @abstractmethod
