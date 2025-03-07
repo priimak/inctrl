@@ -212,6 +212,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../supported_instruments/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Supported instruments
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../name_resolution/" class="md-nav__link">
         
   
@@ -789,8 +810,8 @@ of signal <code>ch3</code> (that is known as <em>trigger source</em>) when it cr
 <p>As you can see default <code>slope</code> is <code>TriggerSlope.RISING</code> but you can change to <code>TriggerSlope.FALLING</code>.
 Parameter <code>delay</code> refer to position on the screen when trigger is fired. Default value of 0 seconds places trigger
 position in the middle of the screen, i.e. there is a same duration of captured signal before and after trigger.
-Setting delay to negative value moves trigger position to the left, i.e. there is more data points captured after
-the trigger than before. Setting delay to positive value moves trigger position to the right, i.e. there is fewer
+Setting delay to positive value moves trigger position to the left, i.e. there is more data points captured after
+the trigger than before. Setting delay to negative value moves trigger position to the right, i.e. there is fewer
 data points captured after the trigger than before.</p>
 <h4 id="operations">Operations<a class="headerlink" href="#operations" title="Permanent link">&para;</a></h4>
 <p>Once trigger is configured you can arm the trigger to enable it. You can think of this as trigger modes.</p>
@@ -857,7 +878,7 @@ if <code>error_on_timeout</code> is True, then raise RuntimeError after requeste
     <span class="n">level_V</span> <span class="o">=</span> <span class="mf">1.6</span><span class="p">,</span>
 
     <span class="c1"># we are interested in mosty what happens after the trigger point</span>
-    <span class="n">delay</span> <span class="o">=</span> <span class="s2">&quot;-20 us&quot;</span><span class="p">,</span>
+    <span class="n">delay</span> <span class="o">=</span> <span class="s2">&quot;20 us&quot;</span><span class="p">,</span>
 
     <span class="c1"># capture on the falling edge as by default signal is pulled up</span>
     <span class="n">slope</span> <span class="o">=</span> <span class="n">TriggerSlope</span><span class="o">.</span><span class="n">FALLING</span>
