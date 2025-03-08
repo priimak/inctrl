@@ -178,3 +178,38 @@ class Waveform(WaveformProto):
              block: bool = True) -> None:
         requested_time_unit = self._get_optimal_time_unit() if time_unit is None else TimeUnit.value_of(time_unit)
         plotter.render_waveform(self, requested_time_unit, block)
+
+    def __mul__(self, other):
+        if isinstance(other, float) or isinstance(other, int):
+            return Waveform(
+                dx_s = self.__dx_s, trigger_index = self.__trigger_index, ys = self.__ys * other, name = self.__name
+            )
+
+    def __rmul__(self, other):
+        if isinstance(other, float) or isinstance(other, int):
+            return Waveform(
+                dx_s = self.__dx_s, trigger_index = self.__trigger_index, ys = self.__ys * other, name = self.__name
+            )
+
+    def __truediv__(self, scale):
+        if isinstance(scale, float) or isinstance(scale, int):
+            return Waveform(
+                dx_s = self.__dx_s, trigger_index = self.__trigger_index, ys = self.__ys / scale, name = self.__name
+            )
+
+    def __add__(self, other):
+        if not isinstance(other, Waveform):
+            raise RuntimeError(f"Cannot add {other.__class__} to Waveform")
+        elif (self.__xs_s != other.__xs_s).any():
+            raise RuntimeError("These waveforms x-axis do not match")
+        else:
+            return Waveform(
+                dx_s = self.__dx_s, trigger_index = self.__trigger_index,
+                ys = self.__ys + other.__ys, name = self.__name
+            )
+
+    def __sub__(self, other):
+        if not isinstance(other, Waveform):
+            raise RuntimeError(f"Cannot subtract {other.__class__} from Waveform")
+        else:
+            return self + (-1 * other)
