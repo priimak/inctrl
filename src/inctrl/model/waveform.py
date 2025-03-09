@@ -1,3 +1,4 @@
+import csv
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from functools import cache
@@ -30,7 +31,23 @@ class WaveformProto(ABC):
 
 
 class WaveformPlotter(ABC):
-    def render_waveform(self, waveform: WaveformProto, time_unit: TimeUnit, block: bool = True) -> None:
+    def render_waveform(
+            self,
+            waveforms: list[WaveformProto],
+            time_unit: TimeUnit,
+            block: bool = True,
+            dpi: int | None = None,
+            to_file: str | Path | None = None
+    ) -> None:
+        """
+        Render waveforms in the GUI framework.
+
+        :param waveforms: list of waveforms to render
+        :param time_unit: time unit to use
+        :param block: True or False indicating if we want to block when rendering in GUI. Has no effect if writing file.
+        :param dpi: dpi to use
+        :param to_file: if provided render waveforms as PNG into a file.
+        """
         pass
 
     @staticmethod
@@ -40,19 +57,36 @@ class WaveformPlotter(ABC):
 
 
 class MatplotlibWaveformPlotter(WaveformPlotter):
-    def render_waveform(self, waveform: WaveformProto, time_unit: TimeUnit, block: bool = True) -> None:
+    """
+    WaveformPlotter that will render waveforms using matplotlib.
+    """
+
+    def render_waveform(
+            self,
+            waveforms: list[WaveformProto],
+            time_unit: TimeUnit,
+            block: bool = True,
+            dpi: int | None = None,
+            to_file: str | Path | None = None) -> None:
         from matplotlib import pyplot as plt
-        fig = plt.figure(figsize = (12, 6))
+        fig = plt.figure(figsize = (12, 8)) if dpi is None else plt.figure(figsize = (12, 8), dpi = dpi)
         ax = fig.subplots()
         ax.grid(True)
-        xs, ys = waveform.xy(time_unit)
+
+        title = ", ".join([w.name for w in waveforms])
+        for waveform in waveforms:
+            xs, ys = waveform.xy(time_unit)
+            ax.plot(xs, ys)
+
         ax.set_xlabel(f"Time [{time_unit.to_str()}]")
         ax.set_ylabel("V")
-        ax.set_title(waveform.name)
-        ax.plot(xs, ys)
+        ax.set_title(title)
+
         fig.tight_layout()
-        if block:
-            plt.show()
+        if to_file is not None:
+            plt.savefig(to_file)
+        elif block:
+            plt.show(block = True)
         else:
             fig.show()
 
@@ -76,13 +110,21 @@ class Waveform(WaveformProto):
 
     @property
     def name(self) -> str:
+        """ Waveform name. This value will be used when rendering. """
         return self.__name
+
+    @name.setter
+    def name(self, name: str) -> None:
+        self.__name = name
 
     @override
     def xy(self,
            time_unit: TimeUnit | str | None = None,
            x_predicate: Callable[[float], bool] | None = None,
            y_predicate: Callable[[float], bool] | None = None) -> tuple[ndarray, ndarray]:
+        """
+        Return tuple of numpy arrays. First holding values on the x-axis (time) and second on y-axis.
+        """
         return self.x(time_unit, x_predicate, y_predicate), self.y(x_predicate, y_predicate)
 
     def _get_optimal_time_unit(self) -> TimeUnit:
@@ -93,16 +135,13 @@ class Waveform(WaveformProto):
           time_unit: TimeUnit | str | None = None,
           x_predicate: Callable[[float], bool] | None = None,
           y_predicate: Callable[[float], bool] | None = None) -> ndarray:
-        """ Return numpy array holding values on the x-axis (time). Filter on predicates if any given. """
+        """
+        Return numpy array holding values on the x-axis (time). Returned values will be in either requested time unit
+        as given in argument `time_unit` or it will be derived (default) from the waveform itself.
 
-        def get_time_unit():
-            if time_unit is None:
-                window_s = self.__xs_s[-1] - self.__xs_s[0]
-                return Duration.value_of(f"{window_s} s").optimize().time_unit
-            else:
-                return TimeUnit.value_of(time_unit)
-
-        requested_time_unit = get_time_unit()
+        Filter on predicates if any given.
+        """
+        requested_time_unit = self._get_optimal_time_unit() if time_unit is None else TimeUnit.value_of(time_unit)
         phys_unit_scale = TimeUnit.S.value / requested_time_unit.value
 
         if x_predicate is not None and y_predicate is not None:
@@ -128,12 +167,16 @@ class Waveform(WaveformProto):
             return self.__ys
 
     @property
-    def dx(self) -> float:
-        """ Return step on the x-axis. """
+    def dt_s(self) -> float:
+        """ Return time step on the t-axis in seconds. """
         return self.__dx_s
 
+    def time_window_s(self) -> float:
+        """ Return time window/domain on the t-axis in seconds. """
+        return self.__xs_s[-1] - self.__xs_s[0]
+
     def save_to_file(self, filename: str | Path, file_format: str = "parquet") -> None:
-        """ Save this waveform into a file. """
+        """ Save this waveform into a file. Including all metadata associated with this waveform. """
         match file_format:
             case "parquet":
                 data_table = pa.table(
@@ -159,25 +202,37 @@ class Waveform(WaveformProto):
             name = data_table.schema.metadata[b'name'].decode("utf-8"),
         )
 
-    def export_to_csv_file(self, filename: str | Path, time_unit: str | TimeUnit = TimeUnit.S) -> None:
+    def export_to_csv_file(
+            self,
+            filename: str | Path,
+            time_unit: str | TimeUnit = TimeUnit.S,
+            include_column_names: bool = True
+    ) -> None:
         """
-        Export the waveform to a csv file. Resulting file will not have any metadata such
-        as implied waveform name, color for plotting etc. It will only have two columns
-        "x" and "y". Column "x" will contain time in requested `time_unit` (default is seconds).
+        Export the waveform to a csv file. Resulting file will not have any metadata such as
+        implied waveform name, color for plotting etc. It will only have two columns. First column
+        will contain time in requested `time_unit` (default is "seconds") and second colum the waveform
+        value. If `include_column_names` is True (default is True), then the column names will also be
+        included in the first row.
+
         Will raise Exception if unable to write into the file.
         """
-        xs, ys = self.xy(time_unit = time_unit)
         target_file = Path(filename)
-        target_file.parent.mkdir(parents = True, exist_ok = True)
-        csv_text = "x,y\n" + "\n".join([f"{row[0]},{row[1]}" for row in (list(zip(xs, ys)))])
-        target_file.write_text(csv_text)
+        ts, ys = self.xy(time_unit = time_unit)
+        with open(target_file, "w", newline = "") as file:
+            writer = csv.writer(file)
+            if include_column_names:
+                writer.writerow(["t", "y"])
+            writer.writerows(zip(ts, ys))
 
     def plot(self,
              plotter: WaveformPlotter = WaveformPlotter.matplotlib(),
              time_unit: TimeUnit | str | None = None,
-             block: bool = True) -> None:
+             block: bool = True,
+             dpi: int | None = None,
+             to_file: str | Path | None = None) -> None:
         requested_time_unit = self._get_optimal_time_unit() if time_unit is None else TimeUnit.value_of(time_unit)
-        plotter.render_waveform(self, requested_time_unit, block)
+        plotter.render_waveform([self], requested_time_unit, block, dpi, to_file)
 
     def __mul__(self, other):
         if isinstance(other, float) or isinstance(other, int):
@@ -213,3 +268,21 @@ class Waveform(WaveformProto):
             raise RuntimeError(f"Cannot subtract {other.__class__} from Waveform")
         else:
             return self + (-1 * other)
+
+
+class Waveforms:
+    def __init__(self, *waveforms: Waveform):
+        self.waveforms = list(waveforms)
+
+    def _get_optimal_time_unit(self) -> TimeUnit:
+        time_window = self.waveforms[0].time_window_s()
+        return Duration.value_of(f"{time_window} s").optimize().time_unit
+
+    def plot(self,
+             plotter: WaveformPlotter = WaveformPlotter.matplotlib(),
+             time_unit: TimeUnit | str | None = None,
+             block: bool = True,
+             dpi: int | None = None,
+             to_file: str | Path | None = None) -> None:
+        requested_time_unit = self._get_optimal_time_unit() if time_unit is None else TimeUnit.value_of(time_unit)
+        plotter.render_waveform(self.waveforms, requested_time_unit, block, dpi, to_file)
