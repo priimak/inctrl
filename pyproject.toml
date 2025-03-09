@@ -11,6 +11,15 @@ dependencies = [
     "tabulate"
 ]
 
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest"
+]
 [build-system]
 requires = ["setuptools", "wheel", "setuptools-git-versioning"]
 build-backend = "setuptools.build_meta"

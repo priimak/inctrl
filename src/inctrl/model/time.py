@@ -1,6 +1,6 @@
 import re
 from enum import IntEnum
-from typing import Self
+from typing import Self, Any
 
 
 class TimeUnit(IntEnum):
@@ -11,9 +11,11 @@ class TimeUnit(IntEnum):
     KS = 1_000_000_000_000
 
     @staticmethod
-    def value_of(s: str | Self) -> "TimeUnit":
-        if isinstance(s, str):
-            match s:
+    def value_of(s: Any) -> "TimeUnit":
+        if isinstance(s, TimeUnit):
+            return s
+        else:
+            match f"{s}".lower():
                 case "ns":
                     return TimeUnit.NS
                 case "us":
@@ -26,8 +28,6 @@ class TimeUnit(IntEnum):
                     return TimeUnit.KS
                 case _:
                     raise RuntimeError(f"Unknown time unit: {s}")
-        else:
-            return s
 
     def to_str(self) -> str:
         match self:
@@ -46,7 +46,9 @@ class TimeUnit(IntEnum):
 
 
 class Duration:
-    __matcher = re.compile(r"""^(?P<value>-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)\s*(?P<unit>ks|s|ms|us|ns)$""")
+    __matcher = re.compile(
+        r"""^\s*(?P<value>-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)\s*(?P<unit>ks|s|ms|us|ns|KS|S|MS|US|NS)\s*$"""
+    )
 
     def __init__(self, time_interval: float, time_unit: TimeUnit):
         self.__time_interval = time_interval
@@ -54,6 +56,23 @@ class Duration:
 
     def __str__(self):
         return f"{self.__time_interval} {self.time_unit.to_str()}"
+
+    def __repr__(self):
+        return f"Duration({self.__time_interval}, {self.time_unit.to_str()})"
+
+    def __add__(self, other):
+        if isinstance(other, Duration):
+            return Duration(
+                time_interval = self.__time_interval + other.to_float(self.time_unit),
+                time_unit = self.time_unit
+            ).optimize()
+
+    def __sub__(self, other):
+        if isinstance(other, Duration):
+            return Duration(
+                time_interval = self.__time_interval - other.to_float(self.time_unit),
+                time_unit = self.time_unit
+            ).optimize()
 
     def __mul__(self, scale):
         return Duration(self.__time_interval * scale, self.time_unit)
@@ -65,19 +84,37 @@ class Duration:
         return Duration(self.__time_interval / scale, self.time_unit)
 
     def __gt__(self, other):
-        return self.__time_interval > other.to_float(self.time_unit)
+        if isinstance(other, Duration):
+            return self.__time_interval > other.to_float(self.time_unit)
+        else:
+            raise RuntimeError("Duration can only be compared to another duration")
 
     def __ge__(self, other):
-        return self.__time_interval >= other.to_float(self.time_unit)
+        if isinstance(other, Duration):
+            return self.__time_interval > other.to_float(self.time_unit) or self == other
+        else:
+            raise RuntimeError("Duration can only be compared to another duration")
 
     def __lt__(self, other):
-        return self.__time_interval < other.to_float(self.time_unit)
+        if isinstance(other, Duration):
+            return self.__time_interval < other.to_float(self.time_unit)
+        else:
+            raise RuntimeError("Duration can only be compared to another duration")
 
     def __le__(self, other):
-        return self.__time_interval <= other.to_float(self.time_unit)
+        if isinstance(other, Duration):
+            return self.__time_interval < other.to_float(self.time_unit) or self == other
+        else:
+            raise RuntimeError("Duration can only be compared to another duration")
 
     def __eq__(self, other):
-        return self.__time_interval == other.to_float(self.time_unit)
+        if isinstance(other, Duration):
+            return abs(self - other) < ONE_PICOSECOND
+        else:
+            raise RuntimeError("Duration can only be compared to another duration")
+
+    def __abs__(self):
+        return Duration(abs(self.__time_interval), self.time_unit)
 
     def in_unit(self, time_unit: str | TimeUnit) -> Self:
         target_time_unit = TimeUnit.value_of(time_unit)
@@ -87,12 +124,14 @@ class Duration:
         )
 
     @staticmethod
-    def value_of(s: str | Self) -> "Duration":
+    def value_of(s: Any) -> "Duration":
         if isinstance(s, Duration):
             return s
-        match_result = Duration.__matcher.match(s)
+        match_result = Duration.__matcher.match(f"{s}")
         if match_result:
             return Duration(float(match_result.group('value')), TimeUnit.value_of(match_result.group('unit')))
+        else:
+            raise RuntimeError(f"Unable to parse \"{s}\" as duration")
 
     def to_float(self, time_unit: str | TimeUnit) -> float:
         return self.__time_interval * self.time_unit.value / TimeUnit.value_of(time_unit).value
@@ -103,3 +142,6 @@ class Duration:
                 return self.in_unit(time_unit)
 
         return self.in_unit(TimeUnit.NS)
+
+
+ONE_PICOSECOND = Duration.value_of("0.001ns")
