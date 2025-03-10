@@ -88,7 +88,7 @@ ch3 = scope.channel(3)
 clk = scope.channel("CLK")
 ```
 
-Using these variables you can now adjust various properties associated with this channel.
+Using these variables you can now interact with this channel and adjust various properties associated it.
 
 #### Coupling
 
@@ -173,11 +173,31 @@ which set minimum and maximum impedance value valid on a particular scope.
 
 #### Downloading waveform
 
-When tigger (see below) is congured and enabled on the scope, then waveform can be captured and downloaded
+When tigger (see below) is configured and enabled on the scope, then waveform can be captured and downloaded
 as a `Waveform` class like so:
 
 ```python
 c1_waveform: Waveform = ch3.get_waveform()
+```
+
+Returned object (instance of `Waveform` class) will have various metadata mostly related to how it is to be rendered.
+Among this metadata Waveform will have _name_. By default, name given to the waveform will be name of the channel if
+channel does have a name. If channel does not have a name, but is simply referred to by a number, then waveform name
+will be "_Channel $channel_number_".
+
+To give waveform a custom name you can either call `get_waveform($name)` with `name` argument
+
+```python
+mosi_waveform: Waveform = ch3.get_waveform("mosi")
+```
+
+or set name on the already obtained waveform object
+
+```python
+from inctrl import Waveform
+
+c1_waveform: Waveform = ch3.get_waveform()
+c1_waveform.name = "mosi"
 ```
 
 To ensure that you download valid waveform call `scope.trigger.wait_for_waveform(...)` method (see below).

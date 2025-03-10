@@ -12,6 +12,7 @@ from inctrl.model.time import TimeUnit
 
 class SDS8OscilloscopeChannel(ScopeChanel):
     def __init__(self, scope, channel_num: int):
+        super().__init__(channel_name = None, channel_num = channel_num)
         self.scope: SDS8Oscilloscope = scope
         self.__channel_num = channel_num
 
@@ -52,7 +53,7 @@ class SDS8OscilloscopeChannel(ScopeChanel):
                 ) / horizontal_interval
             ),
             ys = np.array(ys),
-            name = f"Channel {self.__channel_num}" if name is None else name
+            name = self.get_channel_name() if name is None else name
         )
 
     def set_coupling(self, coupling: ChannelCoupling, fail_on_error: bool = False) -> ChannelCoupling:

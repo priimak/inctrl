@@ -25,10 +25,21 @@ class ChannelImpedance(IntEnum):
 
 
 class ScopeChanel(TriggerSource):
+    def __init__(self, channel_name: str | None, channel_num: int):
+        self.__channel_name = f"Channel #{channel_num}" if channel_name is None else channel_name
+
     @abstractmethod
     def _scope(self) -> "Oscilloscope":
         pass
 
+    def get_channel_name(self) -> str:
+        """ Returns name of the channel. """
+        return self.__channel_name
+
+    def set_channel_name(self, channel_name: str):
+        self.__channel_name = channel_name
+
+    @abstractmethod
     @abstractmethod
     def get_waveform(self, name: str | None = None) -> Waveform:
         """ 

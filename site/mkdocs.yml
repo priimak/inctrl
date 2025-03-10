@@ -18,3 +18,4 @@ nav:
   - "Name and params resolution": "name_resolution.md"
   - "Oscilloscope API": "oscilloscope.md"
   - "Waveform": "waveform.md"
+  - "Duration": "duration.md"

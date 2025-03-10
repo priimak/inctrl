@@ -21,9 +21,8 @@ class WaveformProto(ABC):
 
     @abstractmethod
     def xy(self,
-           time_unit: TimeUnit | str | None = None,
-           x_predicate: Callable[[float], bool] | None = None,
-           y_predicate: Callable[[float], bool] | None = None) -> tuple[ndarray, ndarray]:
+           time_unit: TimeUnit | str = TimeUnit.S,
+           x_predicate: Callable[[float], bool] | None = None) -> tuple[ndarray, ndarray]:
         """
         Return tuple of numpy arrays. First holding values on the x-axis (time) and second on y-axis.
         Filter on predicates if any given.
@@ -119,52 +118,39 @@ class Waveform(WaveformProto):
 
     @override
     def xy(self,
-           time_unit: TimeUnit | str | None = None,
-           x_predicate: Callable[[float], bool] | None = None,
-           y_predicate: Callable[[float], bool] | None = None) -> tuple[ndarray, ndarray]:
+           time_unit: TimeUnit | str = TimeUnit.S,
+           x_predicate: Callable[[float], bool] | None = None) -> tuple[ndarray, ndarray]:
         """
         Return tuple of numpy arrays. First holding values on the x-axis (time) and second on y-axis.
         """
-        return self.x(time_unit, x_predicate, y_predicate), self.y(x_predicate, y_predicate)
+        return self.x(time_unit, x_predicate), self.y(x_predicate)
 
-    def _get_optimal_time_unit(self) -> TimeUnit:
+    def get_optimal_time_unit(self) -> TimeUnit:
         window_s = self.__xs_s[-1] - self.__xs_s[0]
         return Duration.value_of(f"{window_s} s").optimize().time_unit
 
     def x(self,
-          time_unit: TimeUnit | str | None = None,
-          x_predicate: Callable[[float], bool] | None = None,
-          y_predicate: Callable[[float], bool] | None = None) -> ndarray:
+          time_unit: TimeUnit | str = TimeUnit.S,
+          x_predicate: Callable[[float], bool] | None = None) -> ndarray:
         """
         Return numpy array holding values on the x-axis (time). Returned values will be in either requested time unit
         as given in argument `time_unit` or it will be derived (default) from the waveform itself.
 
         Filter on predicates if any given.
         """
-        requested_time_unit = self._get_optimal_time_unit() if time_unit is None else TimeUnit.value_of(time_unit)
-        phys_unit_scale = TimeUnit.S.value / requested_time_unit.value
+        phys_unit_scale = TimeUnit.S.value / TimeUnit.value_of(time_unit).value
 
-        if x_predicate is not None and y_predicate is not None:
-            return np.array([ab[0] for ab in self.__xy if x_predicate(ab[0]) and y_predicate(ab[1])]) * phys_unit_scale
-        elif x_predicate is not None:
-            return np.array([ab[0] for ab in self.__xy if x_predicate(ab[0])]) * phys_unit_scale
-        elif y_predicate is not None:
-            return np.array([ab[0] for ab in self.__xy if y_predicate(ab[1])]) * phys_unit_scale
-        else:
+        if x_predicate is None:
             return self.__xs_s * phys_unit_scale
-
-    def y(self,
-          x_predicate: Callable[[float], bool] | None = None,
-          y_predicate: Callable[[float], bool] | None = None) -> ndarray:
-        """ Return numpy array holding values on the y-axis (usually voltage). Filter on predicates if any given. """
-        if x_predicate is not None and y_predicate is not None:
-            return np.array([ab[1] for ab in self.__xy if x_predicate(ab[0]) and y_predicate(ab[1])])
-        elif x_predicate is not None:
-            return np.array([ab[1] for ab in self.__xy if x_predicate(ab[0])])
-        elif y_predicate is not None:
-            return np.array([ab[1] for ab in self.__xy if y_predicate(ab[1])])
         else:
+            return np.array([ab[0] for ab in self.__xy if x_predicate(ab[0])]) * phys_unit_scale
+
+    def y(self, x_predicate: Callable[[float], bool] | None = None) -> ndarray:
+        """ Return numpy array holding values on the y-axis (usually voltage). Filter on predicates if any given. """
+        if x_predicate is None:
             return self.__ys
+        else:
+            return np.array([ab[1] for ab in self.__xy if x_predicate(ab[0])])
 
     @property
     def dt_s(self) -> float:
@@ -231,26 +217,42 @@ class Waveform(WaveformProto):
              block: bool = True,
              dpi: int | None = None,
              to_file: str | Path | None = None) -> None:
-        requested_time_unit = self._get_optimal_time_unit() if time_unit is None else TimeUnit.value_of(time_unit)
+        requested_time_unit = self.get_optimal_time_unit() if time_unit is None else TimeUnit.value_of(time_unit)
         plotter.render_waveform([self], requested_time_unit, block, dpi, to_file)
 
     def __mul__(self, other):
-        if isinstance(other, float) or isinstance(other, int):
+        if isinstance(other, Waveform):
+            if (self.__xs_s != other.__xs_s).any():
+                raise RuntimeError("These waveforms x-axis do not match")
+            else:
+                return Waveform(
+                    dx_s = self.__dx_s, trigger_index = self.__trigger_index,
+                    ys = self.__ys * other.__ys, name = self.__name
+                )
+
+        elif isinstance(other, float) or isinstance(other, int):
             return Waveform(
                 dx_s = self.__dx_s, trigger_index = self.__trigger_index, ys = self.__ys * other, name = self.__name
             )
+
+        else:
+            raise RuntimeError("Waveform can only be multiplied by number or another waveform")
 
     def __rmul__(self, other):
         if isinstance(other, float) or isinstance(other, int):
             return Waveform(
                 dx_s = self.__dx_s, trigger_index = self.__trigger_index, ys = self.__ys * other, name = self.__name
             )
+        else:
+            raise RuntimeError("Waveform can only be multiplied by number or another waveform")
 
     def __truediv__(self, scale):
         if isinstance(scale, float) or isinstance(scale, int):
             return Waveform(
                 dx_s = self.__dx_s, trigger_index = self.__trigger_index, ys = self.__ys / scale, name = self.__name
             )
+        else:
+            raise RuntimeError("Waveform can only by divided by a number")
 
     def __add__(self, other):
         if not isinstance(other, Waveform):
