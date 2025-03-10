@@ -12,6 +12,8 @@
         <link rel="prev" href="../oscilloscope/">
       
       
+        <link rel="next" href="../duration/">
+      
       
       <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.6">
@@ -282,6 +284,18 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Waveform
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -293,6 +307,124 @@
 
       </a>
       
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#accessing-x-y-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Accessing x-y values
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#math-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Math operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Math operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scaling
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-subtract-multiply" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add, subtract, multiply
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changing-waveform-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changing waveform metadata
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#saving-into-a-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Saving into a file
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exporting-into-csv" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exporting into csv
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plotting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plotting
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../duration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Duration
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -317,6 +449,92 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#accessing-x-y-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Accessing x-y values
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#math-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Math operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Math operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scaling
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-subtract-multiply" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add, subtract, multiply
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#changing-waveform-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      Changing waveform metadata
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#saving-into-a-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Saving into a file
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exporting-into-csv" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exporting into csv
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plotting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plotting
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -332,6 +550,99 @@
 
 
 <h1 id="waveform">Waveform<a class="headerlink" href="#waveform" title="Permanent link">&para;</a></h1>
+<p>When using oscilloscope you can download waveform for any given channel by calling <code>channel.get_waveform()</code> method.
+On this page we will outline what you can do with the waveform object.</p>
+<h3 id="accessing-x-y-values">Accessing x-y values<a class="headerlink" href="#accessing-x-y-values" title="Permanent link">&para;</a></h3>
+<p>Functions <code>Waveform::x(...)</code>, <code>Waveform::x(...)</code> and <code>Waveform::xy(...)</code> are used to access x-y values of the waveform.
+Function <code>xy(...)</code> is a superset of the other two. Hence, we will talk just about this function. The same concepts will
+be applicable to the <code>x(...)</code> and <code>y(...)</code> functions.</p>
+<p>By default, simply calling <code>waveform.xy()</code> return tuple of numpy ndarrays for the whole of the trace.
+First one holding x-axis values in unit of seconds and second y-axis values (usually that is voltage).</p>
+<div class="highlight"><pre><span></span><code><span class="n">ts</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">xy</span><span class="p">()</span>
+</code></pre></div>
+<p>You can request different time units on the x-axis. For example in microseconds:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ts</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">xy</span><span class="p">(</span><span class="s2">&quot;us&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>or</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">inctrl</span><span class="w"> </span><span class="kn">import</span> <span class="n">TimeUnit</span>
+
+<span class="n">ts</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">xy</span><span class="p">(</span><span class="n">TimeUnit</span><span class="o">.</span><span class="n">US</span><span class="p">)</span>
+</code></pre></div>
+<p>You can indicate time unit as either a string using usual unit notation (<code>"s"</code> for seconds, <code>"ms"</code> for
+milliseconds and so on) or pass <code>TimeUnit</code> enum value.</p>
+<p>Time 0 corresponds to the moment of when trigger is fired. To see part of the waveform after the trigger you can pass
+<code>x_predicate</code> filter argument like so:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ts</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">xy</span><span class="p">(</span><span class="n">x_predicate</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+<p>Note that <code>x_predicate</code> function will always receive time in seconds, independently of the requested time unit.
+Thus following two calls return the same arrays.</p>
+<div class="highlight"><pre><span></span><code><span class="n">ts</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">xy</span><span class="p">(</span><span class="n">time_unit</span> <span class="o">=</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="n">US</span><span class="p">,</span> <span class="n">x_predicate</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="mf">0.003</span><span class="p">)</span>
+
+<span class="n">ts</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">xy</span><span class="p">(</span><span class="n">time_unit</span> <span class="o">=</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="n">MS</span><span class="p">,</span> <span class="n">x_predicate</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="mf">0.003</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="math-operations">Math operations<a class="headerlink" href="#math-operations" title="Permanent link">&para;</a></h3>
+<h4 id="scaling">Scaling<a class="headerlink" href="#scaling" title="Permanent link">&para;</a></h4>
+<p>Waveform can be multiplied or divided by a number producing new scaled waveform. For example:</p>
+<div class="highlight"><pre><span></span><code><span class="n">w2</span> <span class="o">=</span> <span class="n">waveform</span> <span class="o">*</span> <span class="mi">2</span>
+
+<span class="n">w_half</span> <span class="o">=</span> <span class="n">waveform</span> <span class="o">/</span> <span class="mi">2</span>
+</code></pre></div>
+<h3 id="add-subtract-multiply">Add, subtract, multiply<a class="headerlink" href="#add-subtract-multiply" title="Permanent link">&para;</a></h3>
+<p>Two waveforms that have exactly the same values on the x-axis can be added, subtracted or multiplied.</p>
+<div class="highlight"><pre><span></span><code><span class="n">waveform1</span> <span class="o">*</span> <span class="n">waveform2</span>
+</code></pre></div>
+<h3 id="changing-waveform-metadata">Changing waveform metadata<a class="headerlink" href="#changing-waveform-metadata" title="Permanent link">&para;</a></h3>
+<p>Some of the waveform metadata can be changed. In particular waveform has a name derived from either a channel name
+or when waveform if obtained by calling <code>channel.get_waveform(name = "$name")</code>. This name is used for plotting waveform.</p>
+<p>You can change it like so</p>
+<div class="highlight"><pre><span></span><code><span class="n">waveform</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Vout&quot;</span>
+</code></pre></div>
+<h3 id="saving-into-a-file">Saving into a file<a class="headerlink" href="#saving-into-a-file" title="Permanent link">&para;</a></h3>
+<p>Waveform can be saved into a file together with all of its metadata like so</p>
+<div class="highlight"><pre><span></span><code><span class="n">waveform</span><span class="o">.</span><span class="n">save_to_file</span><span class="p">(</span><span class="s2">&quot;waveform.wfm&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>This will save it in compact binary form using <a href="https://parquet.apache.org/">parquet</a> data format.</p>
+<p>It can then be loaded like so</p>
+<div class="highlight"><pre><span></span><code><span class="n">waveform</span> <span class="o">=</span> <span class="n">Waveform</span><span class="o">.</span><span class="n">load_from_file</span><span class="p">(</span><span class="s2">&quot;waveform.wfm&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="exporting-into-csv">Exporting into csv<a class="headerlink" href="#exporting-into-csv" title="Permanent link">&para;</a></h3>
+<p>X and Y values for a waveform can be exported into a csv file like so</p>
+<div class="highlight"><pre><span></span><code><span class="n">waveform</span><span class="o">.</span><span class="n">export_to_csv_file</span><span class="p">(</span><span class="s2">&quot;waveform.csv&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>In this format no metadata will be stored in the resulting file, online time and voltage values.
+By default, resulting csv file will include a header (first row) identifying column names, these will be
+strings <code>"t"</code> and <code>"y"</code>. This header can be excluded like so</p>
+<div class="highlight"><pre><span></span><code><span class="n">waveform</span><span class="o">.</span><span class="n">export_to_csv_file</span><span class="p">(</span><span class="s2">&quot;waveform.csv&quot;</span><span class="p">,</span> <span class="n">include_column_names</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<p>Time column will be in seconds but can overridden like so</p>
+<div class="highlight"><pre><span></span><code><span class="n">waveform</span><span class="o">.</span><span class="n">export_to_csv_file</span><span class="p">(</span><span class="s2">&quot;waveform.csv&quot;</span><span class="p">,</span> <span class="n">time_unit</span> <span class="o">=</span> <span class="s2">&quot;us&quot;</span><span class="p">,</span> <span class="n">include_column_names</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<p>or</p>
+<div class="highlight"><pre><span></span><code><span class="n">waveform</span><span class="o">.</span><span class="n">export_to_csv_file</span><span class="p">(</span><span class="s2">&quot;waveform.csv&quot;</span><span class="p">,</span> <span class="n">time_unit</span> <span class="o">=</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="n">US</span><span class="p">,</span> <span class="n">include_column_names</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="plotting">Plotting<a class="headerlink" href="#plotting" title="Permanent link">&para;</a></h3>
+<p>If optional <a href="https://matplotlib.org/">matplotlib</a> library is installed then waveform can be plotted and shown
+in GUI window like so</p>
+<div class="highlight"><pre><span></span><code><span class="n">waveform</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</code></pre></div>
+<p>This call will block until plot window is closed, unless optional <code>block</code> argument is set to <code>False</code></p>
+<div class="highlight"><pre><span></span><code><span class="n">waveform</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">block</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<p>By default, time unit on the x-axis will be set automatically to provide most compact representation for time values.
+It can, however, be overridden like so:</p>
+<div class="highlight"><pre><span></span><code><span class="n">waveform</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time_unit</span> <span class="o">=</span> <span class="s2">&quot;ms&quot;</span><span class="p">)</span>
+
+<span class="n">waveform</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time_unit</span> <span class="o">=</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="n">MS</span><span class="p">)</span>
+</code></pre></div>
+<p>To generate image png file, pass <code>to_file</code> argument like so</p>
+<div class="highlight"><pre><span></span><code><span class="n">waveform</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">to_file</span> <span class="o">=</span> <span class="s2">&quot;waveform.png&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>When called like so this call never blocks independently value assigned to <code>block</code> argument.</p>
+<p>Writing into png file will use default DPI (dots per inch) value as set in matplotlib, but can be overridden
+by supplying <code>dpi</code> argument like so:</p>
+<div class="highlight"><pre><span></span><code><span class="n">waveform</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">to_file</span> <span class="o">=</span> <span class="s2">&quot;waveform.png&quot;</span><span class="p">,</span> <span class="n">dpi</span> <span class="o">=</span> <span class="mi">600</span><span class="p">)</span>
+</code></pre></div>
+<p>Note, that DPI value will affect image size.</p>
 
 
 

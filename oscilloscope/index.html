@@ -480,6 +480,27 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../duration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Duration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -729,7 +750,7 @@ described in "<a href="../name_resolution/">Instrument name and parameters resol
 <div class="highlight"><pre><span></span><code><span class="n">ch3</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">channel</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 <span class="n">clk</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">channel</span><span class="p">(</span><span class="s2">&quot;CLK&quot;</span><span class="p">)</span>
 </code></pre></div>
-<p>Using these variables you can now adjust various properties associated with this channel.</p>
+<p>Using these variables you can now interact with this channel and adjust various properties associated it.</p>
 <h4 id="coupling">Coupling<a class="headerlink" href="#coupling" title="Permanent link">&para;</a></h4>
 <p>Channel coupling can by set by calling <code>set_coupling(coupling: ChannelCoupling, fail_on_error: bool = False)</code> method.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">inctrl</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChannelCoupling</span>
@@ -779,9 +800,22 @@ decide what do to about it. Alternatively call like so will ensure that requeste
 </code></pre></div>
 <p>which set minimum and maximum impedance value valid on a particular scope.</p>
 <h4 id="downloading-waveform">Downloading waveform<a class="headerlink" href="#downloading-waveform" title="Permanent link">&para;</a></h4>
-<p>When tigger (see below) is congured and enabled on the scope, then waveform can be captured and downloaded
+<p>When tigger (see below) is configured and enabled on the scope, then waveform can be captured and downloaded
 as a <code>Waveform</code> class like so:</p>
 <div class="highlight"><pre><span></span><code><span class="n">c1_waveform</span><span class="p">:</span> <span class="n">Waveform</span> <span class="o">=</span> <span class="n">ch3</span><span class="o">.</span><span class="n">get_waveform</span><span class="p">()</span>
+</code></pre></div>
+<p>Returned object (instance of <code>Waveform</code> class) will have various metadata mostly related to how it is to be rendered.
+Among this metadata Waveform will have <em>name</em>. By default, name given to the waveform will be name of the channel if
+channel does have a name. If channel does not have a name, but is simply referred to by a number, then waveform name
+will be "<em>Channel $channel_number</em>".</p>
+<p>To give waveform a custom name you can either call <code>get_waveform($name)</code> with <code>name</code> argument</p>
+<div class="highlight"><pre><span></span><code><span class="n">mosi_waveform</span><span class="p">:</span> <span class="n">Waveform</span> <span class="o">=</span> <span class="n">ch3</span><span class="o">.</span><span class="n">get_waveform</span><span class="p">(</span><span class="s2">&quot;mosi&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>or set name on the already obtained waveform object</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">inctrl</span><span class="w"> </span><span class="kn">import</span> <span class="n">Waveform</span>
+
+<span class="n">c1_waveform</span><span class="p">:</span> <span class="n">Waveform</span> <span class="o">=</span> <span class="n">ch3</span><span class="o">.</span><span class="n">get_waveform</span><span class="p">()</span>
+<span class="n">c1_waveform</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;mosi&quot;</span>
 </code></pre></div>
 <p>To ensure that you download valid waveform call <code>scope.trigger.wait_for_waveform(...)</code> method (see below).</p>
 <h3 id="trigger">Trigger<a class="headerlink" href="#trigger" title="Permanent link">&para;</a></h3>
