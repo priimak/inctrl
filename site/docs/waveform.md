@@ -62,7 +62,7 @@ w2 = waveform * 2
 w_half = waveform / 2
 ```
 
-### Add, subtract, multiply
+#### Add, subtract, multiply
 
 Two waveforms that have exactly the same values on the x-axis can be added, subtracted or multiplied.
 
