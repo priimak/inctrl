@@ -23,3 +23,6 @@ need power supply that can supply 100 Watts and swapping one for another might n
 To resolve this issue user can request specific capabilities that instantiating power supply my have. Details of that
 can be found in other pages.
 
+_InCtrl_ is written in pure python and distributed under MIT license. Its source code can be found
+at [https://github.com/priimak/inctrl](https://github.com/priimak/inctrl).
+
